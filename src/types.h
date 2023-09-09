@@ -106,6 +106,7 @@ typedef struct
 #define NUM_SPRITES 90
 #define NUM_STRINGS 20
 #define NUM_PERM_OBJECTS 256
+#define SMALL_TEXTURE_ATLAS_MAX_SIZE 32
 
 // Actor bit flags
 

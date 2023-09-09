@@ -4,6 +4,7 @@
 #include "skifree_decomp.h"
 #include "data.h"
 #include "resource.h"
+#include "sdl_helpers.h"
 
 #include <SDL_image.h>
 
@@ -78,10 +79,6 @@ BOOL areRectanglesEqual(RECT* rect1, RECT* rect2) {
 }
 
 char* getCachedString(uint32_t stringIdx) {
-    int length;
-    char* pcVar1;
-    char buf[256];
-
     // if (stringCache[stringIdx] == NULL)
     // {
     //     length = LoadStringA(skiFreeHInstance, stringIdx, buf, 0xff);
@@ -118,8 +115,6 @@ int formatElapsedTime(int totalMillis, char* outputString) {
 void drawText(HDC hdc, LPCSTR textStr, short x, short* y, int textLen) {
     // TextOutA(hdc, (int)x, (int)*y, textStr, textLen);
 
-    // int text_width;
-    // int text_height;
     SDL_Surface* surface;
     SDL_Color textColor = { 0, 0, 0, 0 };
 
@@ -129,7 +124,7 @@ void drawText(HDC hdc, LPCSTR textStr, short x, short* y, int textLen) {
     rect.y = *y;
     rect.w = surface->w;
     rect.h = surface->h;
-    int res = SDL_BlitSurface(surface, NULL, statusWindowSurface, &rect);
+    SDL_BlitSurface(surface, NULL, statusWindowSurface, &rect);
     SDL_FreeSurface(surface);
     *y = *y + textLineHeight;
 }
@@ -260,9 +255,6 @@ void HandleSDLWindowEvent(SDL_Event* e) {
 
 // TODO not byte accurate.
 BOOL allocateMemory() {
-    int i;
-
-    // STRINGTABLE = LocalAlloc(LMEM_FIXED, NUM_STRINGS * sizeof(char **));
     sprites = malloc(NUM_SPRITES * sizeof(Sprite));
     actors = malloc(NUM_ACTORS * sizeof(Actor));
     permObjects = malloc(NUM_PERM_OBJECTS * sizeof(PermObject));
@@ -433,36 +425,13 @@ void setupGameTitleActors() {
 /* WARNING: Removing unreachable block (ram,0x004053c9) */
 
 int initWindows() {
-    // ATOM AVar1;
     short windowWidth;
-    HDC hdc;
-    uint32_t uVar2;
-    BOOL BVar3;
+    // uint32_t uVar2;
+    // BOOL BVar3;
     int nHeight;
-    int X;
     char* lpWindowName;
     int nWidth;
-    DWORD dwStyle;
-    int Y;
-    HWND hWndParent;
-    // HINSTANCE hInstance_00;
-    // LPVOID lpParam;
-    // WNDCLASSA wndClass;
 
-    // hdc = GetDC(NULL);
-    // if (hdc == NULL)
-    // {
-    //     return 0;
-    // }
-    // uVar2 = GetDeviceCaps(hdc, HORZRES);
-    // SCREEN_WIDTH = SCREEN_WIDTH & 0xffff0000U | uVar2 & 0xffff;
-    // uVar2 = GetDeviceCaps(hdc, VERTRES);
-    // SCREEN_HEIGHT = SCREEN_HEIGHT & 0xffff0000U | uVar2 & 0xffff;
-    // ReleaseDC((HWND)0x0, hdc);
-    // skiFreeHInstance = hInstance;
-    // whiteBrush = (HBRUSH)GetStockObject(0);
-    // hSkiMainWnd = (HWND)0x0;
-    // hSkiStatusWnd = (HWND)0x0;
     SCREEN_WIDTH = 1280;
     SCREEN_HEIGHT = 1024;
 
@@ -486,7 +455,7 @@ int initWindows() {
     //     return 0;
     // }
     timerCallbackFuncPtr = timerCallbackFunc;
-    if ((isSoundDisabled == 0) && (BVar3 = loadSoundFunc(), BVar3 != 0)) {
+    if ((isSoundDisabled == 0) && (loadSoundFunc() != 0)) {
         loadSound(1, &sound_1);
         loadSound(2, &sound_2);
         loadSound(3, &sound_3);
@@ -504,9 +473,6 @@ int initWindows() {
     nWidth = windowWidth;
     // lpParam = (LPVOID)0x0;
     nHeight = (int)(short)SCREEN_HEIGHT;
-    hWndParent = (HWND)0x0;
-    Y = 0;
-    X = ((short)SCREEN_WIDTH - nWidth) / 2;
     lpWindowName = getCachedString(IDS_TITLE);
 
     nWidth = 1008;
@@ -526,6 +492,8 @@ int initWindows() {
     for (Uint32 i = 0; i < info.num_texture_formats; i++) {
         printf("%s\n", SDL_GetPixelFormatName(info.texture_formats[i]));
     }
+
+    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xFF);
 
     // if (hSkiMainWnd != (HWND)0x0)
     // {
@@ -547,8 +515,7 @@ int initWindows() {
     calculateStatusWindowDimensions(hSkiStatusWnd);
     statusWindowTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, statusWindowTotalTextWidth, statusWindowHeight);
 
-    int BVar1 = loadBitmaps(hSkiMainWnd);
-    if (BVar1 != 0) {
+    if (loadBitmaps(hSkiMainWnd) != 0) {
         updateWindowSize(hSkiMainWnd);
         return 1;
     }
@@ -853,14 +820,6 @@ void handleCharMessage(uint32_t charCode) {
     return;
 }
 
-void handleWindowSizeMessage(void) {
-    int nWidth;
-
-    nWidth = (int)(short)((short)statusWindowTotalTextWidth + 4);
-    // MoveWindow(hSkiStatusWnd, windowClientRect.right - nWidth, windowClientRect.top, nWidth,
-    //            (int)(short)(statusWindowHeight + 4), 1);
-}
-
 RECT* updateActorSpriteRect(Actor* actor) {
     ski_assert(actor, 931);
     ski_assert((actor->flags & FLAG_4) == 0, 932);
@@ -875,29 +834,24 @@ RECT* updateActorSpriteRect(Actor* actor) {
 }
 
 void mainWindowPaint(HWND param_1) {
-    // PAINTSTRUCT paint;
     RECT r;
     r.left = 0;
     r.right = windowClientRect.right;
     r.top = 0;
     r.bottom = windowClientRect.bottom;
 
-    // BeginPaint(param_1, &paint);
-    // FillRect(paint.hdc, &paint.rcPaint, whiteBrush);
-
-    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xFF);
-
-    // Clear screen
     SDL_RenderClear(renderer);
 
     paintActors(NULL, &r);
+
+    // draw status window
     SDL_Rect dstrect;
     dstrect.x = windowWidth - statusWindowTotalTextWidth;
     dstrect.y = 0;
     dstrect.w = statusWindowTotalTextWidth;
     dstrect.h = statusWindowHeight;
     SDL_RenderCopy(renderer, statusWindowTexture, NULL, &dstrect);
-    // EndPaint(param_1, &paint);
+
     SDL_RenderPresent(renderer);
 }
 
@@ -937,19 +891,11 @@ void statusWindowFindLongestTextString(HDC hdc, short* maxLength, LPCSTR textStr
     }
 }
 
-void set_pixel(SDL_Surface* surface, int x, int y, Uint32 pixel) {
-    Uint32* const target_pixel = (Uint32*)((Uint8*)surface->pixels
-        + y * surface->pitch
-        + x * surface->format->BytesPerPixel);
-    *target_pixel = pixel;
-}
-
 // Originally called when handling WM_PAINT message
 void paintStatusWindow(HWND hWnd) {
     char* str;
     int len;
-    int* piVar1;
-    int y;
+    short y;
 
     y = 2;
     // BeginPaint(hWnd, &paint);
@@ -1424,7 +1370,7 @@ Actor* actorSetSpriteIdx(Actor* actor, uint16_t spriteIdx) {
         actor->flags = actor->flags & (int)0xfffffffb;
         actor->flags |= FLAG_20;
 
-        actor->flags = ((isSlowTile(spriteIdx) & 1) << 6) | actor->flags & 0xffffffbf;
+        actor->flags = ((isSlowTile(spriteIdx) & 1) << 6) | (actor->flags & 0xffffffbf);
     }
     return actor;
 }
@@ -1491,7 +1437,7 @@ Actor* updateActorPositionMaybe(Actor* actor, short newX, short newY, short inAi
         actor->yPosMaybe = newY;
         actor->xPosMaybe = newX;
         actor->isInAir = inAir;
-        *(uint32_t*)&actor->flags = (uint32_t)(bVar3 | 8) << 2 | *(uint32_t*)&actor->flags & 0xfffffffb;
+        actor->flags = (uint32_t)(bVar3 | 8) << 2 | (actor->flags & 0xfffffffb);
     }
     return actor;
 }
@@ -3007,8 +2953,11 @@ void handleMouseMoveMessage(short xPos, short yPos) {
 // TODO not byte accurate
 void updateWindowSize(HWND hWnd) {
     DAT_0040c760 = 0;
-    // GetClientRect(hWnd, &windowClientRect);
-    SDL_GetRendererOutputSize(renderer, &windowClientRect.right, &windowClientRect.bottom);
+    int w, h;
+
+    SDL_GetRendererOutputSize(renderer, &w, &h);
+    windowClientRect.right = w;
+    windowClientRect.bottom = h;
 
     updateActorsAfterWindowResize(
         (windowClientRect.left + windowClientRect.right) / 2,
@@ -3611,9 +3560,7 @@ void updateGameState() {
 
 // TODO not byte accurate register usage is swapped.
 BOOL createBitmapSheets(HDC param_1) {
-    HBITMAP pHVar1;
-    HGDIOBJ pvVar2;
-
+    HBITMAP bitmap;
     int resourceId;
     Sprite* sprite;
     short maxWidth;
@@ -3641,25 +3588,23 @@ BOOL createBitmapSheets(HDC param_1) {
     smallSpriteYOffset = 0;
     largeSpriteYOffset = 0;
 
-    for (resourceId = 1; (uint16_t)resourceId < 90; resourceId++) {
-        pHVar1 = loadBitmapResource(resourceId);
-        if (pHVar1 == NULL) {
+    for (resourceId = 1; resourceId < 90; resourceId++) {
+        bitmap = loadBitmapResource(resourceId);
+        if (bitmap == NULL) {
             return FALSE;
         }
-        // GetObjectA(pHVar1, sizeof(BITMAP), &bitmap);
-        if (pHVar1->w > maxWidth) {
-            maxWidth = (short)pHVar1->w;
+        if (bitmap->w > maxWidth) {
+            maxWidth = bitmap->w;
         }
-        if (pHVar1->h > maxHeight) {
-            maxHeight = (short)pHVar1->h;
+        if (bitmap->h > maxHeight) {
+            maxHeight = bitmap->h;
         }
-        if (pHVar1->w > 32) {
-            largeBitmapSheetHeight += pHVar1->h;
+        if (bitmap->w > 32) {
+            largeBitmapSheetHeight += bitmap->h;
         } else {
-            smallBitmapSheetHeight += pHVar1->h;
+            smallBitmapSheetHeight += bitmap->h;
         }
-        // DeleteObject(pHVar1);
-        SDL_FreeSurface(pHVar1);
+        SDL_FreeSurface(bitmap);
     }
 
     // smallBitmapDC = CreateCompatibleDC(param_1);
@@ -3735,19 +3680,19 @@ BOOL createBitmapSheets(HDC param_1) {
     for (resourceId = 1; (uint16_t)resourceId < 90; resourceId++) {
         sprite = &sprites[resourceId];
         sprite->id = resourceId;
-        pHVar1 = loadBitmapResource(resourceId);
-        if (pHVar1 == (HBITMAP)0x0) {
+        bitmap = loadBitmapResource(resourceId);
+        if (bitmap == (HBITMAP)0x0) {
             return FALSE;
         }
         // GetObjectA(pHVar1, sizeof(BITMAP), &bitmap);
 
-        spriteWidth = pHVar1->w;
-        spriteHeigth = pHVar1->h;
+        spriteWidth = bitmap->w;
+        spriteHeigth = bitmap->h;
 
         sprite->width = spriteWidth;
         sprite->height = spriteHeigth;
-        sprite->totalPixels = (short)(spriteWidth * spriteHeigth);
-        if ((short)spriteWidth > 32) {
+        sprite->totalPixels = (spriteWidth * spriteHeigth);
+        if (spriteWidth > SMALL_TEXTURE_ATLAS_MAX_SIZE) {
             sheetYOffset = largeSpriteYOffset;
             largeSpriteYOffset += spriteHeigth;
             currentSurface = largeBitmapDC;
@@ -3756,17 +3701,16 @@ BOOL createBitmapSheets(HDC param_1) {
             smallSpriteYOffset += spriteHeigth;
             currentSurface = smallBitmapDC;
         }
-        sprite->sheetYOffset = (short)sheetYOffset;
-        // pvVar2 = SelectObject(bitmapSourceDC, pHVar1);
-        sprite->sheetDC = (short)spriteWidth > 32 ? largeBitmapDC : smallBitmapDC;
-        sprite->sheetDC_1bpp = (short)spriteWidth > 32 ? largeBitmapDC_1bpp : smallBitmapDC_1bpp;
+        sprite->sheetYOffset = sheetYOffset;
+        sprite->sheetDC = spriteWidth > SMALL_TEXTURE_ATLAS_MAX_SIZE ? largeBitmapDC : smallBitmapDC;
+        sprite->sheetDC_1bpp = spriteWidth > SMALL_TEXTURE_ATLAS_MAX_SIZE ? largeBitmapDC_1bpp : smallBitmapDC_1bpp;
 
         SDL_Rect dstrect;
         dstrect.x = 0;
         dstrect.y = sheetYOffset;
-        dstrect.w = pHVar1->w;
-        dstrect.h = pHVar1->h;
-        SDL_BlitSurface(pHVar1, NULL, currentSurface, &dstrect);
+        dstrect.w = bitmap->w;
+        dstrect.h = bitmap->h;
+        SDL_BlitSurface(bitmap, NULL, currentSurface, &dstrect);
 
         // BitBlt(sprite->sheetDC, 0, sheetYOffset, bitmap.bmWidth, bitmap.bmHeight, bitmapSourceDC, 0, 0,
         //         0xcc0020);
@@ -3907,7 +3851,7 @@ void drawActor(HDC hdc, Actor* actor) {
     Actor* actor_00;
     short sVar10;
     Actor** ppAVar11;
-    DWORD rop;
+    // DWORD rop;
     Actor* local_24;
     Actor* local_20;
     int local_1c;
@@ -3956,8 +3900,6 @@ void drawActor(HDC hdc, Actor* actor) {
                 } else {
                     rect = &actor->someRect;
                 }
-
-                printf("spriteX %d %d\n", rect->left, rect->top);
 
                 // SRCAND
                 // BitBlt(hdc, rect->left, rect->top, (int)sprite->width, (int)sprite->height, sprite->sheetDC, 0, (int)sprite->sheetYOffset, 0x8800c6);
@@ -4053,7 +3995,7 @@ void drawActor(HDC hdc, Actor* actor) {
                 if ((((0 < (short)local_14) || (0 < sVar10)) || (spriteWidth < newWidth)) || (spriteHeight < newHeight)) {
                     // PatBlt(bitmapSourceDC, 0, 0, (int)newWidth, (int)newHeight, 0xff0062);
                 }
-                rop = 0xcc0020;
+                // rop = 0xcc0020;
             } else {
                 // SRCPAINT
                 // BitBlt(bitmapSourceDC, (int)(short)local_14, (int)sVar10, spriteWidth, spriteHeight, sprite->sheetDC_1bpp, 0, (int)sheetY,
@@ -4085,10 +4027,6 @@ void drawActor(HDC hdc, Actor* actor) {
     if (local_1c != 0) {
         // SRCCOPY
         // BitBlt(hdc, (int)(short)actorRectLeft, (int)y, (int)newWidth, (int)(short)newHeight, bitmapSourceDC, 0, 0, 0xcc0020);
-
-        if (newHeight != sprite->height || newWidth != sprite->width) {
-            int i = 0;
-        }
 
         return;
     }
