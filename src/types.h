@@ -5,20 +5,19 @@
 #ifndef SKIFREE_DECOMP_TYPES_H
 #define SKIFREE_DECOMP_TYPES_H
 
-// #include "resource.h"
+#include <SDL.h>
+
 typedef int BOOL;
-typedef void *HDC;
-typedef void *HWND;
-typedef void *HGDIOBJ;
+typedef void* HDC;
+typedef void* HWND;
+typedef void* HGDIOBJ;
 typedef unsigned long DWORD;
-typedef char *LPCSTR;
-typedef SDL_Surface *HBITMAP;
+typedef char* LPCSTR;
 
 #define TRUE 1
 #define FALSE 0
 
-typedef struct _RECT
-{
+typedef struct _RECT {
     long left;
     long top;
     long right;
@@ -30,17 +29,16 @@ typedef struct
     int id; // added by jeff
     HDC sheetDC;
     HDC sheetDC_1bpp;
-    SDL_Texture *sheet;
+    SDL_Texture* sheet;
     short sheetYOffset;
     short width;
     short height;
     short totalPixels;
 } Sprite;
 
-typedef struct PermObject
-{
-    struct Actor *actor;
-    Sprite *spritePtr;
+typedef struct PermObject {
+    struct Actor* actor;
+    Sprite* spritePtr;
     short spriteIdx;
     // 2 bytes padding
     int actorTypeMaybe;
@@ -54,22 +52,20 @@ typedef struct PermObject
     int unk_0x20;
 } PermObject;
 
-typedef struct PermObjectList
-{
-    struct PermObject *startingObject;
-    struct PermObject *nextObject;
-    struct PermObject *currentObj;
+typedef struct PermObjectList {
+    struct PermObject* startingObject;
+    struct PermObject* nextObject;
+    struct PermObject* currentObj;
 } PermObjectList;
 
-typedef struct Actor
-{
-    struct Actor *next;
-    struct Actor *linkedActor;
-    struct Actor *actorPtr;
-    struct PermObject *permObject;
+typedef struct Actor {
+    struct Actor* next;
+    struct Actor* linkedActor;
+    struct Actor* actorPtr;
+    struct PermObject* permObject;
     uint16_t spriteIdx2;
     // 2 byte padding TODO check alignment of struct
-    Sprite *spritePtr;
+    Sprite* spritePtr;
     int typeMaybe;
     uint32_t frameNo;
     RECT someRect;
@@ -96,8 +92,8 @@ typedef struct
 
 typedef struct
 {
-    /*HGLOBAL*/ void *soundResource;
-    void *soundData;
+    /*HGLOBAL*/ void* soundResource;
+    void* soundData;
 } Sound;
 
 typedef struct

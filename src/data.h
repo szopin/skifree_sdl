@@ -36,12 +36,14 @@ const uint16_t actorFrameToSpriteTbl[] = {
     0x4A, 0x4B, 0x4C, 0x4D,
     0x4E, 0x4F, 0x50, 0x51,
     0x53, 0x54, 0x55, 0x54,
-    0x31, 0x57, 0x58, 0x59};
+    0x31, 0x57, 0x58, 0x59
+};
 
 const uint32_t uint32_t_ARRAY_0040a22c[] = {
     6, 22, 27, 31,
     39, 42, 42, 42,
-    42, 56, 60};
+    42, 56, 60
+};
 
 const ActorVelStruct ActorVelStruct_ARRAY_0040a308[] = {
     {
@@ -241,7 +243,8 @@ const ActorVelStruct ActorVelStruct_ARRAY_0040a308[] = {
         0,  //             xRelated
         0,  //             unk_a
         21  //              frameNo
-    }};
+    }
+};
 
 // The original optimises the data packing by omitting the first 13 records
 const uint32_t uint32_t_ARRAY_0040a434[] = {
@@ -250,7 +253,8 @@ const uint32_t uint32_t_ARRAY_0040a434[] = {
     0, 0, 0, 0,
     0, 0, 3, 6,
     11, 11, 11, 11,
-    11, 11, 0};
+    11, 11, 0
+};
 
 const ActorVelStruct beginnerActorMovementTbl[] = {
     {
@@ -297,7 +301,8 @@ const ActorVelStruct beginnerActorMovementTbl[] = {
         0, // xRelated
         0, // unk_a
         26 // frameNo
-    }};
+    }
+};
 
 const ActorVelStruct snowboarderActorMovementTbl[] = {
     {
@@ -371,45 +376,47 @@ const ActorVelStruct snowboarderActorMovementTbl[] = {
         0, // xRelated
         0, // unk_a
         38 // frameNo
-    }};
+    }
+};
 
 const PlayerTurnFrameNoLookupTbl playerTurnFrameNoTbl[] = {
-    {1, 4},
-    {2, 0},
-    {3, 1},
-    {7, 2},
-    {0, 5},
-    {4, 6},
-    {5, 8},
-    {3, 2},
-    {5, 6},
-    {9, 2},
-    {5, 10},
-    {3, 6},
-    {3, 6},
-    {14, 15},
-    {16, 13},
-    {13, 16},
-    {15, 14},
-    {14, 15},
-    {20, 21},
-    {20, 21},
-    {16, 13},
-    {13, 16}};
+    { 1, 4 },
+    { 2, 0 },
+    { 3, 1 },
+    { 7, 2 },
+    { 0, 5 },
+    { 4, 6 },
+    { 5, 8 },
+    { 3, 2 },
+    { 5, 6 },
+    { 9, 2 },
+    { 5, 10 },
+    { 3, 6 },
+    { 3, 6 },
+    { 14, 15 },
+    { 16, 13 },
+    { 13, 16 },
+    { 15, 14 },
+    { 14, 15 },
+    { 20, 21 },
+    { 20, 21 },
+    { 16, 13 },
+    { 13, 16 }
+};
 
 char sourceFilename[] = "V:\\hack\\ski32\\ski2.c";
 
 Actor blankTemplateActor = {
-    NULL,         // next
-    NULL,         // linkedActor
-    NULL,         // actorPtr
-    NULL,         // permObject
-    0,            // spriteIdx2
-    NULL,         // spritePtr
-    18,           // typeMaybe
-    64,           // frameNo
-    {0, 0, 0, 0}, // someRect
-    {0, 0, 0, 0}, // rect
+    NULL,           // next
+    NULL,           // linkedActor
+    NULL,           // actorPtr
+    NULL,           // permObject
+    0,              // spriteIdx2
+    NULL,           // spritePtr
+    18,             // typeMaybe
+    64,             // frameNo
+    { 0, 0, 0, 0 }, // someRect
+    { 0, 0, 0, 0 }, // rect
 
     0, // xPosMaybe
     0, // yPosMaybe
@@ -420,38 +427,28 @@ Actor blankTemplateActor = {
     0  // flags
 };
 
-SDL_Window *hSkiMainWnd = NULL;
-SDL_Window *hSkiStatusWnd = NULL;
-SDL_Renderer *renderer;
-TTF_Font *statusFont;
-SDL_Texture *t = NULL;
+SDL_Window* hSkiMainWnd = NULL;
+SDL_Window* hSkiStatusWnd = NULL;
+SDL_Renderer* renderer;
 
-SDL_Texture *largeTextureAtlas;
-SDL_Texture *smallTextureAtlas;
+SDL_Texture* t = NULL;
 
-char *stringCache[] = {
-    "SkiFree",
-    "Ski Paused ... Press F3 to continue",
-    "Time:",
-    "Dist:",
-    "Speed:",
-    "Style:",
-    "00:00:00.00",
-    " 0000m",
-    " 0000m/s",
-    "0000000",
-    "%2u:%2.2u:%2.2u.%2.2u",
-    "%5.2dm",
-    "%5.2dm/s",
-    "%7ld",
-    "High Scores"};
+SDL_Texture* largeTextureAtlas;
+SDL_Texture* smallTextureAtlas;
+
+SDL_Texture* statusWindowTexture;
+SDL_Surface* statusWindowSurface;
+SDL_TimerID timer_id;
+
+#define USER_EVENT_CODE_TIMER 1
+
 // HINSTANCE skiFreeHInstance = NULL;
-Sprite *sprites = NULL;
-Actor *actors = NULL;
-Actor *actorListPtr = NULL;
-Actor *playerActor = NULL;
-Actor *playerActorPtrMaybe_1 = NULL;
-PermObject *permObjects = NULL;
+Sprite* sprites = NULL;
+Actor* actors = NULL;
+Actor* actorListPtr = NULL;
+Actor* playerActor = NULL;
+Actor* playerActorPtrMaybe_1 = NULL;
+PermObject* permObjects = NULL;
 BOOL isSoundDisabled = 0;
 uint16_t SCREEN_WIDTH = 0;
 uint16_t SCREEN_HEIGHT = 0;
@@ -484,7 +481,8 @@ Sound sound_7;
 Sound sound_8;
 Sound sound_9;
 // LPCTSTR statusWindowNameStrPtr;
-HGDIOBJ statusWindowFont;
+// HGDIOBJ statusWindowFont;
+TTF_Font* statusWindowFont;
 short textLineHeight;
 short statusWindowHeight;
 short statusWindowTotalTextWidth;
@@ -493,14 +491,14 @@ BOOL isGameTimerRunning;
 BOOL isSsGameMode;
 BOOL isGsGameMode;
 int updateTimerDurationMillis;
-void *DAT_0040c78c;
-Actor *currentFreeActor;
+void* DAT_0040c78c;
+Actor* currentFreeActor;
 BOOL isTurboMode;
 // HDC smallBitmapDC;
-SDL_Surface *smallBitmapDC;
+SDL_Surface* smallBitmapDC;
 HDC smallBitmapDC_1bpp;
 // HDC largeBitmapDC;
-SDL_Surface *largeBitmapDC;
+SDL_Surface* largeBitmapDC;
 HDC largeBitmapDC_1bpp;
 HDC bitmapSourceDC;
 HGDIOBJ smallBitmapSheet;
@@ -508,7 +506,7 @@ HGDIOBJ smallBitmapSheet_1bpp;
 HGDIOBJ largeBitmapSheet;
 HGDIOBJ largeBitmapSheet_1bpp;
 // HGDIOBJ scratchBitmap;
-SDL_Surface *scratchBitmap;
+SDL_Surface* scratchBitmap;
 BOOL isFsGameMode;
 int stylePoints;
 int playerX;
@@ -521,9 +519,9 @@ int totalAreaOfActorSprites;
 short windowHeight;
 short windowWidth;
 int windowWithMarginTotalArea;
-PermObject *currentSlalomFlag;
-PermObject *firstSlalomFlagLeft;
-PermObject *FirstSlalomFlagRight;
+PermObject* currentSlalomFlag;
+PermObject* firstSlalomFlagLeft;
+PermObject* FirstSlalomFlagRight;
 int INT_0040c964;
 int INT_0040c968;
 int INT_0040c960;
