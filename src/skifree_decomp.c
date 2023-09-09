@@ -851,6 +851,7 @@ void mainWindowPaint(HWND param_1) {
     dstrect.w = statusWindowTotalTextWidth;
     dstrect.h = statusWindowHeight;
     SDL_RenderCopy(renderer, statusWindowTexture, NULL, &dstrect);
+    SDL_RenderDrawRect(renderer, &dstrect);
 
     SDL_RenderPresent(renderer);
 }
