@@ -646,9 +646,6 @@ void togglePausedState() {
 void pauseGame() {
     if (hSkiMainWnd != NULL && isGameTimerRunning) {
         isGameTimerRunning = FALSE;
-        // SDL_RemoveTimer(timer_id);
-        // timer_id = 0;
-        //  KillTimer(hSkiMainWnd, 0x29a);
         pauseStartTickCount = currentTickCount;
     }
 }
@@ -966,7 +963,7 @@ void setupActorList() {
         uVar1 = uVar3 & 0xffff;
         uVar2 = uVar1 + 1;
     } while (uVar2 < NUM_ACTORS);
-    actors[uVar3].next = (Actor*)0x0;
+    actors[uVar3].next = NULL;
 }
 
 void resetPermObjectCount() {
@@ -1287,7 +1284,7 @@ void actorClearFlag10(Actor* actor1, Actor* actor2) {
     ppAVar3 = &actor1->actorPtr;
     pAVar1 = actor1->actorPtr;
 
-    while (pAVar1 != (Actor*)0x0) {
+    while (pAVar1 != NULL) {
         pAVar2 = *ppAVar3;
         if ((pAVar2->flags & FLAG_10) != 0) {
             assertFailed(sourceFilename, 1260);
@@ -1351,7 +1348,7 @@ Actor* duplicateAndLinkActor(Actor* actor) {
 
     pAVar1 = addActor(actor, 1);
     actor->linkedActor = pAVar1;
-    if (pAVar1 != (Actor*)0x0) {
+    if (pAVar1 != NULL) {
         pAVar1->linkedActor = actor;
         pAVar1->flags |= FLAG_2;
         actor->flags &= 0xfffffffe; // Clear FLAG_1
@@ -1494,7 +1491,7 @@ Actor* addRandomActor(int borderType) {
             spriteIdx = getSpriteIdxForActorType(actorType);
             actor = addActorOfTypeWithSpriteIdx(actorType, spriteIdx);
         }
-        if (actor != (Actor*)0x0) {
+        if (actor != NULL) {
             actor = updateActorPositionMaybe(actor, x, y, 0);
             return actor;
         }
@@ -1944,7 +1941,7 @@ void permObjectSetSpriteIdx(PermObject* permObject, uint16_t spriteIdx) {
     ski_assert(permObject, 1773);
 
     permObject->spriteIdx = spriteIdx;
-    permObject->spritePtr = sprites + spriteIdx;
+    permObject->spritePtr = &sprites[spriteIdx];
     if (permObject->actor) {
         actorSetSpriteIdx(permObject->actor, spriteIdx);
     }
@@ -1962,7 +1959,7 @@ void updateFsGameMode(Actor* actor, short xPos, short yPos) {
         ski_assert(actor->typeMaybe == 0, 1839);
 
         if (isFsGameMode != 0) {
-            if (0x4100 < y) {
+            if (y > 0x4100) {
                 isFsGameMode = 0;
                 INT_0040c968 = 1;
                 resetPlayerFrameNo();
@@ -2744,12 +2741,12 @@ void FUN_004046e0(PermObjectList* permObjList) {
 // TODO not byte accurate.
 BOOL resetGame(void) {
     currentTickCount = SDL_GetTicks();
-    // tood
+    // todo
     //  srand(currentTickCount);
     srand(1);
     setupActorList();
-    playerActorPtrMaybe_1 = (Actor*)0x0;
-    playerActor = (Actor*)0x0;
+    playerActorPtrMaybe_1 = NULL;
+    playerActor = NULL;
     totalAreaOfActorSprites = 0;
     resetPermObjectCount();
     isTurboMode = 0;
@@ -3276,7 +3273,7 @@ void handleKeydownMessage(SDL_Event* e) {
     //     break;
     // }
 
-    if (playerActor == (Actor*)0x0) {
+    if (playerActor == NULL) {
         return;
     }
     ActorframeNo = playerActor->frameNo;
@@ -3474,7 +3471,7 @@ void updateGameState() {
     FUN_004046e0(&PermObjectList_0040c738);
     updateAllPermObjectsInList(&PermObjectList_0040c720);
     removeFlag8ActorsFromList();
-    for (pAVar7 = actorListPtr; pAVar7 != (Actor*)0x0; pAVar7 = pAVar7->next) {
+    for (pAVar7 = actorListPtr; pAVar7 != NULL; pAVar7 = pAVar7->next) {
         if ((pAVar7->flags & FLAG_2) == 0) {
             if ((pAVar7->flags & FLAG_4) != 0) {
                 ptVar6 = &pAVar7->someRect;
@@ -3731,7 +3728,7 @@ void drawWindow(HDC hdc, RECT* windowRect) {
     // ski_assert(hdc, 1272);
     ski_assert(windowRect, 1273);
 
-    for (pAVar7 = actorListPtr; pAVar7 != (Actor*)0x0; pAVar7 = pAVar7->next) {
+    for (pAVar7 = actorListPtr; pAVar7 != NULL; pAVar7 = pAVar7->next) {
         /* if FLAG_1 FLAG_2 FLAG_8 are unset */
         if ((pAVar7->flags & (FLAG_1 | FLAG_2 | FLAG_8)) == 0) {
             pAVar6 = pAVar7->linkedActor;
@@ -3754,7 +3751,7 @@ void drawWindow(HDC hdc, RECT* windowRect) {
             }
         }
     }
-    for (pAVar7 = actorListPtr; pAVar7 != (Actor*)0x0; pAVar7 = pAVar7->next) {
+    for (pAVar7 = actorListPtr; pAVar7 != NULL; pAVar7 = pAVar7->next) {
         if ((pAVar7->flags & FLAG_8) != 0) {
             pAVar7->flags &= 0xffffffef;
         } else {
@@ -3771,7 +3768,7 @@ void drawWindow(HDC hdc, RECT* windowRect) {
                 (pAVar7->rect).top = ptVar3->top;
                 (pAVar7->rect).right = ptVar3->right;
                 (pAVar7->rect).bottom = ptVar3->bottom;
-                pAVar7->actorPtr = (Actor*)0x0;
+                pAVar7->actorPtr = NULL;
             }
         }
     }
@@ -3780,7 +3777,7 @@ void drawWindow(HDC hdc, RECT* windowRect) {
         if ((pAVar7->flags & FLAG_10) != 0) {
             pAVar6 = pAVar7->linkedActor;
 
-            if (pAVar6 != (Actor*)0x0 && (pAVar6->flags & FLAG_10) != 0 && doRectsOverlap(&pAVar7->rect, &pAVar6->rect)) {
+            if (pAVar6 != NULL && (pAVar6->flags & FLAG_10) != 0 && doRectsOverlap(&pAVar7->rect, &pAVar6->rect)) {
                 actorClearFlag10(pAVar7, pAVar6);
             }
 
@@ -3793,13 +3790,13 @@ void drawWindow(HDC hdc, RECT* windowRect) {
         }
     }
 
-    for (pAVar7 = actorListPtr; pAVar7 != (Actor*)0x0; pAVar7 = pAVar7->next) {
+    for (pAVar7 = actorListPtr; pAVar7 != NULL; pAVar7 = pAVar7->next) {
         if ((pAVar7->flags & FLAG_10) != 0) {
             drawActor(hdc, pAVar7);
         }
     }
 
-    for (pAVar7 = actorListPtr; pAVar7 != (Actor*)0x0; pAVar7 = pAVar7->next) {
+    for (pAVar7 = actorListPtr; pAVar7 != NULL; pAVar7 = pAVar7->next) {
         if ((pAVar7->flags & FLAG_2) != 0) {
             actorSetFlag8IfFlag1IsUnset(pAVar7);
         }
@@ -3846,14 +3843,14 @@ void drawActor(HDC hdc, Actor* actor) {
     // ski_assert(hdc, 1134);
     ski_assert((actor->flags & FLAG_10) != 0, 1135);
 
-    if (actor == (Actor*)0x0) {
+    if (actor == NULL) {
         return;
     }
 
     pAVar7 = actor;
     while ((pAVar7->flags & FLAG_1) << 1 != (pAVar7->flags & FLAG_2)) {
         pAVar7 = pAVar7->actorPtr;
-        if (pAVar7 == (Actor*)0x0) {
+        if (pAVar7 == NULL) {
             return;
         }
     }
@@ -3893,11 +3890,11 @@ void drawActor(HDC hdc, Actor* actor) {
     }
 
     do {
-        actor_00 = (Actor*)0x0;
-        local_24 = (Actor*)0x0;
+        actor_00 = NULL;
+        local_24 = NULL;
         pAVar7 = actor;
         ppAVar11 = &local_20;
-        if (actor == (Actor*)0x0)
+        if (actor == NULL)
             break;
         do {
             ppAVar1 = &actor->actorPtr;
@@ -3908,7 +3905,7 @@ void drawActor(HDC hdc, Actor* actor) {
                     sVar8 = actor->spritePtr->height;
                 }
                 uVar6 = actor->yPosMaybe - sVar8;
-                if ((actor_00 == (Actor*)0x0) || ((short)uVar6 < (short)local_8)) {
+                if ((actor_00 == NULL) || ((short)uVar6 < (short)local_8)) {
                     actor_00 = actor;
                     local_24 = actor;
                     local_8 = uVar6; // actor->flags & 0xffff0000 | (uint32_t)uVar6;
@@ -3924,9 +3921,9 @@ void drawActor(HDC hdc, Actor* actor) {
             }
             actor = *ppAVar1;
             ppAVar11 = ppAVar1;
-        } while (actor != (Actor*)0x0);
+        } while (actor != NULL);
         actor = pAVar7;
-        if (actor_00 != (Actor*)0x0) {
+        if (actor_00 != NULL) {
             sprite = actor_00->spritePtr;
             spriteWidth = sprite->width;
             spriteHeight = sprite->height;
@@ -3991,7 +3988,7 @@ void drawActor(HDC hdc, Actor* actor) {
             *local_4 = local_24->actorPtr;
             actor = local_20;
         }
-    } while (actor != (Actor*)0x0);
+    } while (actor != NULL);
     if (local_1c != 0) {
         // SRCCOPY
         // BitBlt(hdc, (int)(short)actorRectLeft, (int)y, (int)newWidth, (int)(short)newHeight, bitmapSourceDC, 0, 0, 0xcc0020);

@@ -440,8 +440,6 @@ SDL_Texture* statusWindowTexture;
 SDL_Surface* statusWindowSurface;
 SDL_TimerID timer_id;
 
-#define USER_EVENT_CODE_TIMER 1
-
 // HINSTANCE skiFreeHInstance = NULL;
 Sprite* sprites = NULL;
 Actor* actors = NULL;
