@@ -589,12 +589,12 @@ Actor* updateActorPositionWithVelocityMaybe(Actor* actor) {
 void startGameTimer() {
     if (hSkiMainWnd && !isGameTimerRunning && !isPaused) {
         isGameTimerRunning = TRUE;
-        currentTickCount = SDL_GetTicks(); // GetTickCount();
+        currentTickCount = SDL_GetTicks();
         if ((isSsGameMode != 0) || (isGsGameMode != 0)) {
             timedGameRelated = timedGameRelated + (currentTickCount - pauseStartTickCount);
         }
+        // We do timing in the main loop instead of separate thread
         // SetTimer(hSkiMainWnd, 0x29a, updateTimerDurationMillis & 0xffff, timerCallbackFuncPtr);
-        // timer_id = SDL_AddTimer(updateTimerDurationMillis, timerCallbackFuncPtr, NULL);
     }
 }
 
@@ -635,15 +635,12 @@ void togglePausedState() {
     if (isGameTimerRunning != 0) {
         pauseGame();
         str = getCachedString(IDS_PAUSED);
-        // SetWindowTextA(hSkiMainWnd, str);
         SDL_SetWindowTitle(hSkiMainWnd, str);
-        // InvalidateRect(hSkiMainWnd, NULL, 0);
-        return;
+    } else {
+        str = getCachedString(IDS_TITLE);
+        SDL_SetWindowTitle(hSkiMainWnd, str);
+        startGameTimer();
     }
-    str = getCachedString(IDS_TITLE);
-    // SetWindowTextA(hSkiMainWnd, str);
-    SDL_SetWindowTitle(hSkiMainWnd, str);
-    startGameTimer();
 }
 
 void pauseGame() {
