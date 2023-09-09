@@ -10,6 +10,92 @@
 
 #define ski_assert(exp, line) (void)((exp) || (assertFailed(sourceFilename, line), 0)) // TODO remove need for src param.
 
+// int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int main(int argc, char* argv[]) {
+    int iVar1;
+    BOOL retVal;
+    // MSG msg;
+    SDL_Event event;
+
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
+        printf("failed to init\n");
+        return 1;
+    }
+
+    TTF_Init();
+
+    // todo
+    // iVar1 = strcmp(lpCmdLine, s_nosound_0040c0fc);
+    // if (iVar1 == 0)
+    // {
+    //     isSoundDisabled = 1;
+    // }
+    retVal = allocateMemory();
+    if (retVal == 0) {
+        return 0;
+    }
+    retVal = resetGame();
+    if (retVal == 0) {
+        return 0;
+    }
+    retVal = initWindows(/*hInstance, hPrevInstance, nCmdShow*/);
+    if (retVal == 0) {
+        return 0;
+    }
+    iVar1 = setupGame();
+    if (iVar1 == 0) {
+        SDL_DestroyWindow(hSkiMainWnd);
+        cleanupSound();
+        return 0;
+    }
+    // iVar1 = GetMessageA(&msg, NULL, 0, 0);
+    // while (iVar1 != 0)
+    // {
+    //     TranslateMessage(&msg);
+    //     DispatchMessageA(&msg);
+    //     iVar1 = GetMessageA(&msg, NULL, 0, 0);
+    // }
+
+    paintStatusWindow(NULL);
+
+    int is_running = 1;
+    int last_timer = SDL_GetTicks();
+    while (is_running) {
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+            case SDL_QUIT:
+                is_running = 0;
+                break;
+            case SDL_WINDOWEVENT:
+                HandleWindowMessage(&event);
+                break;
+            case SDL_KEYDOWN:
+                handleKeydownMessage(&event);
+                break;
+
+                // case SDL_USEREVENT:
+                //     switch (event.user.code) {
+                //     case USER_EVENT_CODE_TIMER:
+                //         timerUpdateFunc();
+                //         break;
+                //     default:
+                //         abort();
+                //     }
+                //     break;
+            }
+        }
+
+        if (isGameTimerRunning && last_timer + 40 < SDL_GetTicks()) {
+            timerUpdateFunc();
+            last_timer = SDL_GetTicks();
+        }
+
+        mainWindowPaint(hSkiMainWnd);
+    }
+    cleanupSound();
+    return 0;
+}
+
 int max(int a, int b) {
     if (a > b) {
         return a;
@@ -129,115 +215,13 @@ void drawText(HDC hdc, LPCSTR textStr, short x, short* y, int textLen) {
     *y = *y + textLineHeight;
 }
 
-Uint32 timerCallbackFunc(Uint32 interval) {
-    if (inputEnabled != 0) {
-
-        SDL_Event event;
-        memset(&event, 0, sizeof(event));
-        event.type = SDL_USEREVENT;
-        event.user.code = USER_EVENT_CODE_TIMER;
-        event.user.data1 = 0;
-        event.user.data2 = 0;
-        SDL_PushEvent(&event);
-    }
-    // TODO check. The original seems to return 1 here.
-    return interval;
-}
-
-// TODO check this for byte accuracy.
-// int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-int main(int argc, char* argv[]) {
-    int iVar1;
-    BOOL retVal;
-    // MSG msg;
-    SDL_Event event;
-
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
-        printf("failed to init\n");
-        return 1;
-    }
-
-    TTF_Init();
-
-    // todo
-    // iVar1 = strcmp(lpCmdLine, s_nosound_0040c0fc);
-    // if (iVar1 == 0)
-    // {
-    //     isSoundDisabled = 1;
-    // }
-    retVal = allocateMemory();
-    if (retVal == 0) {
-        return 0;
-    }
-    retVal = resetGame();
-    if (retVal == 0) {
-        return 0;
-    }
-    retVal = initWindows(/*hInstance, hPrevInstance, nCmdShow*/);
-    if (retVal == 0) {
-        return 0;
-    }
-    iVar1 = setupGame();
-    if (iVar1 == 0) {
-        SDL_DestroyWindow(hSkiMainWnd);
-        cleanupSound();
-        return 0;
-    }
-    // iVar1 = GetMessageA(&msg, NULL, 0, 0);
-    // while (iVar1 != 0)
-    // {
-    //     TranslateMessage(&msg);
-    //     DispatchMessageA(&msg);
-    //     iVar1 = GetMessageA(&msg, NULL, 0, 0);
-    // }
-
-    paintStatusWindow(NULL);
-
-    int is_running = 1;
-    int last_timer = SDL_GetTicks();
-    while (is_running) {
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT:
-                is_running = 0;
-                break;
-            case SDL_WINDOWEVENT:
-                HandleSDLWindowEvent(&event);
-                break;
-            case SDL_KEYDOWN:
-                handleKeydownMessage(&event);
-                break;
-
-                // case SDL_USEREVENT:
-                //     switch (event.user.code) {
-                //     case USER_EVENT_CODE_TIMER:
-                //         timerUpdateFunc();
-                //         break;
-                //     default:
-                //         abort();
-                //     }
-                //     break;
-            }
-        }
-
-        if (isGameTimerRunning && last_timer + 40 < SDL_GetTicks()) {
-            timerUpdateFunc();
-            last_timer = SDL_GetTicks();
-        }
-
-        mainWindowPaint(hSkiMainWnd);
-    }
-    cleanupSound();
-    return 0;
-}
-
-void HandleSDLWindowEvent(SDL_Event* e) {
+void HandleWindowMessage(SDL_Event* e) {
     switch (e->window.event) {
     case SDL_WINDOWEVENT_FOCUS_GAINED:
-
         mainWndActivationFlags = 1;
         updateWindowsActiveStatus();
         break;
+
     case SDL_WINDOWEVENT_FOCUS_LOST:
         mainWndActivationFlags = 0;
         updateWindowsActiveStatus();
@@ -272,34 +256,34 @@ BOOL allocateMemory() {
 
 // TODO not byte perfect
 Actor* updateActorType1_Beginner(Actor* actor) {
-    int uVar1;
+    int random_result;
     Actor* pAVar2;
-    uint32_t ActorframeNo;
+    uint32_t actorFrameNo;
 
-    ActorframeNo = actor->frameNo;
+    actorFrameNo = actor->frameNo;
     if (actor == NULL) {
         assertFailed(sourceFilename, 2130);
     }
     if (actor->typeMaybe != 1) {
         assertFailed(sourceFilename, 2131);
     }
-    if (ActorframeNo < 25) {
+    if (actorFrameNo < 25) {
         pAVar2 = updateActorPositionWithVelocityMaybe(actor);
-        if (ActorframeNo - 22 >= 5) {
+        if (actorFrameNo - 22 >= 5) {
             assertFailed(sourceFilename, 2135);
         }
-        pAVar2 = updateActorVelMaybe(pAVar2, &beginnerActorMovementTbl[ActorframeNo - 22]);
+        pAVar2 = updateActorVelMaybe(pAVar2, &beginnerActorMovementTbl[actorFrameNo - 22]);
         if (ski_random(0xc) == 0) {
-            uVar1 = ski_random(3);
-            if (uVar1 == 0) {
-                ActorframeNo = 0x16;
-            } else if (uVar1 == 1) {
+            random_result = ski_random(3);
+            if (random_result == 0) {
+                actorFrameNo = 0x16;
+            } else if (random_result == 1) {
                 return setActorFrameNo(pAVar2, 0x17);
-            } else if (uVar1 == 2) {
+            } else if (random_result == 2) {
                 return setActorFrameNo(pAVar2, 0x18);
             }
         }
-        return setActorFrameNo(pAVar2, ActorframeNo);
+        return setActorFrameNo(pAVar2, actorFrameNo);
     }
     return actor;
 }
@@ -307,49 +291,49 @@ Actor* updateActorType1_Beginner(Actor* actor) {
 // TODO not byte perfect
 Actor* updateActorType2_dog(Actor* actor) {
     short sVar1;
-    short uVar2;
-    Actor* pAVar3;
+    short rand_result;
+    Actor* new_actor;
     short newY;
-    uint32_t ActorframeNo;
+    uint32_t actorFrameNo;
     short inAir;
 
-    ActorframeNo = actor->frameNo;
+    actorFrameNo = actor->frameNo;
     if (actor->typeMaybe != 2) {
         assertFailed(sourceFilename, 2162);
     }
-    switch (ActorframeNo) {
+    switch (actorFrameNo) {
     case 0x1b:
-        uVar2 = ski_random(3);
-        actor->verticalVelocityMaybe = uVar2 - 1;
-        pAVar3 = updateActorPositionWithVelocityMaybe(actor);
-        return setActorFrameNo(pAVar3, 0x1c);
+        rand_result = ski_random(3);
+        actor->verticalVelocityMaybe = rand_result - 1;
+        new_actor = updateActorPositionWithVelocityMaybe(actor);
+        return setActorFrameNo(new_actor, 0x1c);
     case 0x1c:
         actor->HorizontalVelMaybe = 4;
-        pAVar3 = updateActorPositionWithVelocityMaybe(actor);
-        return setActorFrameNo(pAVar3, 0x1b);
+        new_actor = updateActorPositionWithVelocityMaybe(actor);
+        return setActorFrameNo(new_actor, 0x1b);
     case 0x1d:
         actor->verticalVelocityMaybe = 0;
         actor->HorizontalVelMaybe = 0;
-        uVar2 = ski_random(0x20);
-        pAVar3 = updateActorPositionWithVelocityMaybe(actor);
-        return setActorFrameNo(pAVar3, uVar2 != 0 ? 0x1b + 3 : 0x1b);
+        rand_result = ski_random(0x20);
+        new_actor = updateActorPositionWithVelocityMaybe(actor);
+        return setActorFrameNo(new_actor, rand_result != 0 ? 0x1b + 3 : 0x1b);
     case 0x1e:
-        uVar2 = ski_random(100);
-        if (uVar2 != 0) {
-            pAVar3 = updateActorPositionWithVelocityMaybe(actor);
-            return setActorFrameNo(pAVar3, 0x1d);
+        rand_result = ski_random(100);
+        if (rand_result != 0) {
+            new_actor = updateActorPositionWithVelocityMaybe(actor);
+            return setActorFrameNo(new_actor, 0x1d);
         }
         inAir = actor->isInAir;
         sVar1 = actor->xPosMaybe;
         newY = actor->yPosMaybe + -2;
         /* dog wee */
-        pAVar3 = addActorOfTypeWithSpriteIdx(ACTOR_TYPE_17_SIGN, 0x52);
-        updateActorPositionMaybe(pAVar3, (short)(sVar1 - 4), newY, inAir);
-        ActorframeNo = 0x1b;
+        new_actor = addActorOfTypeWithSpriteIdx(ACTOR_TYPE_17_SIGN, 0x52);
+        updateActorPositionMaybe(new_actor, (short)(sVar1 - 4), newY, inAir);
+        actorFrameNo = 0x1b;
         playSound(&sound_8);
     }
-    pAVar3 = updateActorPositionWithVelocityMaybe(actor);
-    return setActorFrameNo(pAVar3, ActorframeNo);
+    new_actor = updateActorPositionWithVelocityMaybe(actor);
+    return setActorFrameNo(new_actor, actorFrameNo);
 }
 
 Actor* updateActorType9_treeOnFire(Actor* actor) {
@@ -366,13 +350,11 @@ Actor* updateActorType9_treeOnFire(Actor* actor) {
 }
 
 Actor* getLinkedActorIfExists(Actor* actor) {
-    Actor* pAVar1;
     ski_assert(actor, 965);
-    pAVar1 = actor->linkedActor;
     if (actor->linkedActor == NULL) {
-        pAVar1 = actor;
+        return actor;
     }
-    return pAVar1;
+    return actor->linkedActor;
 }
 
 int showErrorMessage(LPCSTR text) {
@@ -454,7 +436,7 @@ int initWindows() {
     //     hSkiMainWnd = (HWND)0x0;
     //     return 0;
     // }
-    timerCallbackFuncPtr = timerCallbackFunc;
+    // timerCallbackFuncPtr = timerCallbackFunc;
     if ((isSoundDisabled == 0) && (loadSoundFunc() != 0)) {
         loadSound(1, &sound_1);
         loadSound(2, &sound_2);
@@ -471,12 +453,13 @@ int initWindows() {
         windowWidth = SCREEN_HEIGHT;
     }
     nWidth = windowWidth;
-    // lpParam = (LPVOID)0x0;
-    nHeight = (int)(short)SCREEN_HEIGHT;
+    nHeight = SCREEN_HEIGHT;
     lpWindowName = getCachedString(IDS_TITLE);
 
+    // todo figure out client size we want
     nWidth = 1008;
     nHeight = 985;
+
     hSkiMainWnd = SDL_CreateWindow(lpWindowName,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
@@ -489,37 +472,20 @@ int initWindows() {
     SDL_GetRendererInfo(renderer, &info);
     printf("Renderer name: %s\n", info.name);
     printf("Texture formats:\n");
-    for (Uint32 i = 0; i < info.num_texture_formats; i++) {
+    for (int i = 0; i < info.num_texture_formats; i++) {
         printf("%s\n", SDL_GetPixelFormatName(info.texture_formats[i]));
     }
 
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xFF);
 
-    // if (hSkiMainWnd != (HWND)0x0)
-    // {
-    //     hSkiStatusWnd =
-    //         CreateWindowExA(0, "SkiStatus", statusWindowNameStrPtr, 0x40000000, 0, 0, 0, 0, hSkiMainWnd,
-    //                         (HMENU)0x0, hInstance, (LPVOID)0x0);
-    //     if (hSkiStatusWnd != (HWND)0x0)
-    //     {
-    //         ShowWindow(hSkiMainWnd, nCmdShow);
-    //         UpdateWindow(hSkiMainWnd);
-    //         ShowWindow(hSkiStatusWnd, 1);
-    //         UpdateWindow(hSkiStatusWnd);
-    //         return 1;
-    //     }
-    //     DestroyWindow(hSkiMainWnd);
-    //     return 0;
-    // }
-
     calculateStatusWindowDimensions(hSkiStatusWnd);
     statusWindowTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, statusWindowTotalTextWidth, statusWindowHeight);
 
-    if (loadBitmaps(hSkiMainWnd) != 0) {
-        updateWindowSize(hSkiMainWnd);
-        return 1;
+    if (loadBitmaps(hSkiMainWnd) == 0) {
+        return 0;
     }
-    return 0;
+    updateWindowSize(hSkiMainWnd);
+    return 1;
 }
 
 BOOL loadSoundFunc() {
@@ -550,30 +516,35 @@ BOOL loadSound(uint32_t resourceId, Sound* sound) {
 }
 
 uint16_t getSpriteIdxForActorType(int actorType) {
-    int uVar1;
+    int rand_result;
 
     switch (actorType) {
     case ACTOR_TYPE_11_MOGULS:
         return 0x1b;
+
+    case ACTOR_TYPE_13_TREE:
+        rand_result = ski_random(8);
+        // TODO bytes here don't match exactly
+        if (rand_result == 0) {
+            return 0x32;
+        }
+        if (rand_result == 1) {
+            return 0x33;
+        }
+        return 0x31;
+
+    case ACTOR_TYPE_14_ROCK_STUMP:
+        return ski_random(4) != 0 ? 0x2d : 0x2e;
+
+    case ACTOR_TYPE_15_BUMP:
+        return ski_random(3) != 0 ? 0x2f : 0x30;
+
+    case ACTOR_TYPE_16_JUMP:
+        return 0x34;
+
     default:
         assertFailed(sourceFilename, 1571);
         return 0;
-    case ACTOR_TYPE_13_TREE:
-        uVar1 = ski_random(8);
-        // TODO bytes here don't match exactly
-        if (uVar1) {
-            if (uVar1 != 1) {
-                return 0x31;
-            }
-            return 0x33;
-        }
-        return 0x32;
-    case ACTOR_TYPE_14_ROCK_STUMP:
-        return ski_random(4) != 0 ? 0x2d : 0x2e;
-    case ACTOR_TYPE_15_BUMP:
-        return ski_random(3) != 0 ? 0x2f : 0x30;
-    case ACTOR_TYPE_16_JUMP:
-        return 0x34;
     }
 }
 
@@ -851,7 +822,6 @@ void mainWindowPaint(HWND param_1) {
     dstrect.w = statusWindowTotalTextWidth;
     dstrect.h = statusWindowHeight;
     SDL_RenderCopy(renderer, statusWindowTexture, NULL, &dstrect);
-    SDL_RenderDrawRect(renderer, &dstrect);
 
     SDL_RenderPresent(renderer);
 }

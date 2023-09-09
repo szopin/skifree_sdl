@@ -538,6 +538,6 @@ PermObjectList PermObjectList_0040c720;
 
 int (*sndPlaySoundAFuncPtr)(LPCSTR, uint32_t);
 
-uint32_t (*timerCallbackFuncPtr)(uint32_t);
+// uint32_t (*timerCallbackFuncPtr)(uint32_t);
 
 #endif // SKIFREE_DECOMP_DATA_H

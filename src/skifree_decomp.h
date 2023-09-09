@@ -88,4 +88,6 @@ void updateEntPackIniKeyValue(LPCSTR configKey, int value, int isTime);
 void permObjectSetSpriteIdx(PermObject* permObject, uint16_t spriteIdx);
 void mainWindowPaint(HWND param_1);
 
-void HandleSDLWindowEvent(SDL_Event* e);
+void HandleWindowMessage(SDL_Event* e);
+
+void timerUpdateFunc(void);
