@@ -3,6 +3,7 @@
 
 #include "skifree_decomp.h"
 #include "data.h"
+#include "embedded_resources.h"
 #include "resource.h"
 #include "sdl_helpers.h"
 
@@ -1176,7 +1177,11 @@ HBITMAP loadBitmapResource(uint32_t resourceId) {
     // return LoadBitmapA(skiFreeHInstance, MAKEINTRESOURCE(resourceId));
 
     sprintf(filename, "resources/ski32_%d.bmp", resourceId);
-    SDL_Surface* bitmap = IMG_Load(filename);
+    // SDL_Surface* bitmap = IMG_Load(filename);
+
+    embedded_resource_t* res = get_embedded_resource_by_name(filename);
+    SDL_RWops* src = SDL_RWFromConstMem(res->content, res->len);
+    SDL_Surface* bitmap = IMG_Load_RW(src, 1);
     return bitmap;
 }
 
@@ -1270,16 +1275,16 @@ BOOL changeScratchBitmapSize(short newWidth, short newHeight) {
     return TRUE;
 }
 
-void actorClearFlag10(Actor* actor1, Actor* actor2) {
+void actorClearFlag10(Actor* actor1, Actor* linkedActor) {
     Actor* pAVar1;
     Actor* pAVar2 = actor1;
     Actor** ppAVar3;
 
     ski_assert(actor1, 1252);
-    ski_assert(actor2, 1253);
+    ski_assert(linkedActor, 1253);
     ski_assert((actor1->flags & FLAG_10), 1254); // <---
-    ski_assert((actor2->flags & FLAG_10), 1255);
-    ski_assert(actor1 != actor2, 1256);
+    ski_assert((linkedActor->flags & FLAG_10), 1255);
+    ski_assert(actor1 != linkedActor, 1256);
 
     ppAVar3 = &actor1->actorPtr;
     pAVar1 = actor1->actorPtr;
@@ -1292,11 +1297,11 @@ void actorClearFlag10(Actor* actor1, Actor* actor2) {
         ppAVar3 = &pAVar2->actorPtr;
         pAVar1 = pAVar2->actorPtr;
     }
-    pAVar2->actorPtr = actor2;
+    pAVar2->actorPtr = linkedActor;
 
-    enlargeRect(&actor1->rect, &actor2->rect);
+    enlargeRect(&actor1->rect, &linkedActor->rect);
     /* clear FLAG_10 */
-    actor2->flags &= 0xffffffef;
+    linkedActor->flags &= 0xffffffef;
 }
 
 Actor* setActorFrameNo(Actor* actor, uint32_t ActorframeNo) {

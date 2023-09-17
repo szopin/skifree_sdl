@@ -2,11 +2,27 @@ cmake_minimum_required(VERSION 3.19)
 project(skifree_sdl)
 
 # Add all c source files under the src directory
+
 file(GLOB SOURCES "src/*.c")
-add_executable(${PROJECT_NAME} ${SOURCES})
+file(GLOB resource_files "resources/*.bmp")
+
+add_executable(${PROJECT_NAME})
+target_sources(${PROJECT_NAME} PRIVATE 
+    src/skifree_decomp.c
+    embedded_resources.h
+)
+
+add_custom_command(
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h"
+    COMMAND "${CMAKE_COMMAND}" "-DSOURCE_DIR=${CMAKE_SOURCE_DIR}" "-DRESOURCES_GLOB=resources/*.bmp" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/EmbedResources.cmake"
+    DEPENDS ${resource_files}
+)
 
 # Add all headers files under the include directory
-target_include_directories(${PROJECT_NAME} PRIVATE include)
+target_include_directories(${PROJECT_NAME} PRIVATE 
+    include
+    "${CMAKE_CURRENT_BINARY_DIR}"
+)
 
 # Add compiler errors/warnings flags
 target_compile_options(${PROJECT_NAME} PRIVATE $<$<C_COMPILER_ID:MSVC>:/W4 /WX>)
@@ -16,19 +32,3 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 target_link_libraries(${PROJECT_NAME} SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf)
-
-
-# Add SDL2_net library
-#find_package(SDL2_net REQUIRED)
-#target_link_libraries(${PROJECT_NAME} SDL2::Net)
-
-# Add SDL2_mixer library
-#find_package(SDL2_mixer REQUIRED)
-#target_link_libraries(${PROJECT_NAME} SDL2::Mixer)
-
-# Add SDL2_gfx library
-#find_package(SDL2_gfx REQUIRED)
-#target_link_libraries(${PROJECT_NAME} SDL2::GFX)
-
-# Copy assets
-file(COPY resources DESTINATION ${CMAKE_BINARY_DIR})
