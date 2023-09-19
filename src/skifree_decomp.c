@@ -6,8 +6,8 @@
 #include "embedded_resources.h"
 #include "resource.h"
 #include "sdl_helpers.h"
-
 #include <SDL_image.h>
+#include <stdio.h>
 
 #define ski_assert(exp, line) (void)((exp) || (assertFailed(sourceFilename, line), 0)) // TODO remove need for src param.
 
@@ -408,9 +408,9 @@ void setupGameTitleActors() {
 /* WARNING: Removing unreachable block (ram,0x004053c9) */
 
 int initWindows() {
-    short windowWidth;
-    // uint32_t uVar2;
-    // BOOL BVar3;
+    // short windowWidth;
+    //  uint32_t uVar2;
+    //  BOOL BVar3;
     int nHeight;
     char* lpWindowName;
     int nWidth;
