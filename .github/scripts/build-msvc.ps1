@@ -13,13 +13,21 @@ if ($($Env:GITHUB_REF_TYPE) -eq "tag") {
 }
 
 $sdl2_version = "2.24.0"
+$sdl2_image_version = "2.6.3"
 
 # install deps
 Invoke-WebRequest -Uri https://www.libsdl.org/release/SDL2-devel-$sdl2_version-VC.zip -OutFile $Env:TEMP\SDL2-devel.zip
 Expand-Archive $Env:TEMP\SDL2-devel.zip -DestinationPath $Env:TEMP
 
+Invoke-WebRequest -Uri https://github.com/libsdl-org/SDL_image/releases/download/release-2.6.3/SDL2_image-devel-2.6.3-VC.zip -OutFile $Env:TEMP\SDL2-image.zip
+Expand-Archive $Env:TEMP\SDL2-image.zip -DestinationPath $Env:TEMP
+
 # build
-cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON "-DSDL2_ROOT_DIR=$($Env:TEMP)\SDL2-$sdl2_version" -B build
+cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON `
+  "-DSDL2_ROOT_DIR=$($Env:TEMP)\SDL2-$sdl2_version" `
+  "-DSDL2_IMAGE_PATH=$($Env:TEMP)\SDL2_image-$sdl2_image_version" `
+  -B build
+  
 if ($LASTEXITCODE -ne 0) {
     Exit $LASTEXITCODE
 }
