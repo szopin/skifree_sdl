@@ -25,10 +25,7 @@ Expand-Archive $Env:TEMP\SDL2-image.zip -DestinationPath $Env:TEMP
 $Env:SDLDIR = $($Env:TEMP)\SDL2-$sdl2_version"
 
 # build
-cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON `
-  "-DSDL2_ROOT_DIR=$($Env:TEMP)\SDL2-$sdl2_version" `
-  "-DSDL2_IMAGE_PATH=$($Env:TEMP)\SDL2_image-$sdl2_image_version" `
-  -B build
+cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON "-DSDL2_ROOT_DIR=$($Env:TEMP)\SDL2-$sdl2_version" -B build
 
 if ($LASTEXITCODE -ne 0) {
     Exit $LASTEXITCODE
