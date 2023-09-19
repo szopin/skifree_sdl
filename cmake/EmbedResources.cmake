@@ -17,7 +17,7 @@ endfunction()
 function(embed_resource resource_file_name source_file_name variable_name)
     # hex functions by amir-saniyan https://gist.github.com/amir-saniyan/de99cee82fa9d8d615bb69f3f53b6004
     
-    file(READ "${resource_file_name}" hex_content HEX)
+    file(READ "${SOURCE_DIR}/${resource_file_name}" hex_content HEX)
     string(REPEAT "[0-9a-f]" 32 pattern)
     string(REGEX REPLACE "(${pattern})" "\\1\n" content "${hex_content}")
     string(REGEX REPLACE "([0-9a-f][0-9a-f])" "0x\\1, " content "${content}")
