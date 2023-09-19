@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.19)
 project(skifree_sdl)
 
+set(CMAKE_MODULE_PATH ${_MODULE_PATH} "${skifree_sdl_SOURCE_DIR}/cmake/")
+
+find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
+find_package(SDL2_ttf REQUIRED)
+
 # Add all c source files under the src directory
 
 file(GLOB SOURCES "src/*.c")
@@ -22,13 +28,14 @@ add_custom_command(
 target_include_directories(${PROJECT_NAME} PRIVATE 
     include
     "${CMAKE_CURRENT_BINARY_DIR}"
+    ${SDL2_IMAGE_INCLUDE_DIR}
+    ${SDL2_TTF_INCLUDE_DIR}
 )
+
+
 
 # Add compiler errors/warnings flags
 target_compile_options(${PROJECT_NAME} PRIVATE $<$<C_COMPILER_ID:MSVC>:/W4 /WX>)
 target_compile_options(${PROJECT_NAME} PRIVATE $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wall>)
 
-find_package(SDL2 REQUIRED)
-find_package(SDL2_image REQUIRED)
-find_package(SDL2_ttf REQUIRED)
-target_link_libraries(${PROJECT_NAME} SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf)
+target_link_libraries(${PROJECT_NAME} SDL2::SDL2 ${SDL2_IMAGE_LIBRARIES} ${SDL2_TTF_LIBRARIES})
