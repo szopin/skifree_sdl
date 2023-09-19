@@ -1,6 +1,8 @@
 // ski32_decomp.cpp : Defines the entry point for the application.
 //
 
+#define NOMINMAX
+
 #include "skifree_decomp.h"
 #include "data.h"
 #include "embedded_resources.h"
