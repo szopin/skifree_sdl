@@ -46,15 +46,14 @@ if ($LASTEXITCODE -ne 0) {
     Exit $LASTEXITCODE
 }
 
-# copy SDL2.dll to build folder, so tests can run
-cp $Env:TEMP\SDL2-$SDL2_VERSION\lib\$sdl_path\SDL2.dll build
-
 # package artifact
 $releasename="skifree_sdl-$build_tag-windows-$Env:PLATFORM_ARCH"
 mkdir "$releasename"
 cp build/skifree_sdl.exe "$releasename/skifree_sdl.exe"
 cp build/skifree_sdl.pdb "$releasename/skifree_sdl.pdb"
-cp build/SDL2.dll "$releasename/SDL2.dll"
+cp $Env:TEMP\SDL2-$SDL2_VERSION\lib\$sdl_path\SDL2.dll $releasename
+cp $Env:TEMP\SDL2_image-$SDL2_IMAGE_VERSION\lib\$sdl_path\SDL2_image.dll $releasename
+cp $Env:TEMP\SDL2_ttf-$SDL2_TTF_VERSION\lib\$sdl_path\SDL2_ttf.dll $releasename
 
 7z a -tzip "$releasename.zip" "$releasename"
 
