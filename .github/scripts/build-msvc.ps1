@@ -22,12 +22,14 @@ Expand-Archive $Env:TEMP\SDL2-devel.zip -DestinationPath $Env:TEMP
 Invoke-WebRequest -Uri https://github.com/libsdl-org/SDL_image/releases/download/release-2.6.3/SDL2_image-devel-2.6.3-VC.zip -OutFile $Env:TEMP\SDL2-image.zip
 Expand-Archive $Env:TEMP\SDL2-image.zip -DestinationPath $Env:TEMP
 
+$Env:SDLDIR = $($Env:TEMP)\SDL2-$sdl2_version"
+
 # build
 cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON `
   "-DSDL2_ROOT_DIR=$($Env:TEMP)\SDL2-$sdl2_version" `
   "-DSDL2_IMAGE_PATH=$($Env:TEMP)\SDL2_image-$sdl2_image_version" `
   -B build
-  
+
 if ($LASTEXITCODE -ne 0) {
     Exit $LASTEXITCODE
 }
