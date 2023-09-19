@@ -99,14 +99,14 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-int max(int a, int b) {
+int max_(int a, int b) {
     if (a > b) {
         return a;
     }
     return b;
 }
 
-int min(int a, int b) {
+int min_(int a, int b) {
     if (b > a) {
         return a;
     }
@@ -2342,7 +2342,7 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
             }
             if (bVar5) {
                 if (iVar4 == ACTOR_TYPE_13_TREE) {
-                    maxSpriteWidth = max(actor1->spritePtr->width, actor2->spritePtr->width);
+                    maxSpriteWidth = max_(actor1->spritePtr->width, actor2->spritePtr->width);
                     if (abs((int)actor1->xPosMaybe - (int)actor2->xPosMaybe) > (int)maxSpriteWidth / 2) {
                         actor1->verticalVelocityMaybe = actor1->verticalVelocityMaybe / 2;
                         return setActorFrameNo(actor1, local_c);
@@ -3300,7 +3300,7 @@ void handleKeydownMessage(SDL_Event* e) {
                 //                        iVar2 = -8;
                 //                    }
                 //                    playerActor->HorizontalVelMaybe = (short) iVar2;
-                playerActor->HorizontalVelMaybe = max(playerActor->HorizontalVelMaybe - 8, -8);
+                playerActor->HorizontalVelMaybe = max_(playerActor->HorizontalVelMaybe - 8, -8);
             }
             break;
         case 0x27:
@@ -3316,7 +3316,7 @@ void handleKeydownMessage(SDL_Event* e) {
                 //                    }
                 //                    playerActor->HorizontalVelMaybe = (short) iVar2;
 
-                playerActor->HorizontalVelMaybe = min(playerActor->HorizontalVelMaybe + 8, 8);
+                playerActor->HorizontalVelMaybe = min_(playerActor->HorizontalVelMaybe + 8, 8);
             }
             break;
 
