@@ -29,7 +29,7 @@ Expand-Archive $Env:TEMP\SDL2-ttf.zip -DestinationPath $Env:TEMP
 $Env:SDL2_DIR = "$($Env:TEMP)\SDL2-$SDL2_VERSION"
 
 Invoke-WebRequest -Uri https://archive.org/download/ski32_resources/ski32_resources.zip -OutFile $Env:TEMP\ski32_resources.zip
-Expand-Archive ski32_resources.zip -DestinationPath resources
+Expand-Archive $Env:TEMP\ski32_resources.zip -DestinationPath resources
 
 # build
 cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON `
