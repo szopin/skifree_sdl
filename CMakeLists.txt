@@ -20,7 +20,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 
 add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h"
-    COMMAND "${CMAKE_COMMAND}" "-DSOURCE_DIR=${CMAKE_SOURCE_DIR}" "-DRESOURCES_GLOB=resources/*.bmp" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/EmbedResources.cmake"
+    COMMAND "${CMAKE_COMMAND}" "-DSOURCE_DIR=${CMAKE_SOURCE_DIR}" "-DRESOURCES_GLOB=resources/*" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/EmbedResources.cmake"
     DEPENDS ${resource_files}
 )
 

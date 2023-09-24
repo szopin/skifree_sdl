@@ -914,7 +914,9 @@ BOOL calculateStatusWindowDimensions(HWND hWnd) {
     // {
     //     statusWindowFont = SelectObject(statusWindowDC, statusWindowFont);
     // }
-    statusWindowFont = TTF_OpenFont("resources/vgaoem.fon", 12);
+    embedded_resource_t* res = get_embedded_resource_by_name("resources/vgaoem.fon");
+    SDL_RWops* src = SDL_RWFromConstMem(res->content, res->len);
+    statusWindowFont = TTF_OpenFontRW(src, 1, 12);
     if (statusWindowFont == NULL) {
         exit(1);
     }
