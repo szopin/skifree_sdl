@@ -914,7 +914,10 @@ BOOL calculateStatusWindowDimensions(HWND hWnd) {
     // {
     //     statusWindowFont = SelectObject(statusWindowDC, statusWindowFont);
     // }
-    statusWindowFont = TTF_OpenFont("/System/Library/Fonts/Supplemental/Arial.ttf", 12);
+    statusWindowFont = TTF_OpenFont("resources/vgaoem.fon", 12);
+    if (statusWindowFont == NULL) {
+        exit(1);
+    }
 
     // GetTextMetricsA(statusWindowDC, &textMetric);
     TTF_SizeUTF8(statusWindowFont, "A", &w, &h);
