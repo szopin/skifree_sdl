@@ -12,16 +12,47 @@ find_package(SDL2_ttf REQUIRED)
 file(GLOB SOURCES "src/*.c")
 file(GLOB resource_files "resources/*.bmp")
 
-add_executable(${PROJECT_NAME})
-target_sources(${PROJECT_NAME} PRIVATE 
-    src/skifree_decomp.c
-    embedded_resources.h
-)
+if (APPLE)
+
+    # generate icns file
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ski32.icns"
+        COMMAND "${CMAKE_SOURCE_DIR}/tools/make-osx-icns.sh"
+        DEPENDS "resources/ICONSKI.png"
+    )
+
+    set(skifree_sdl_ICON ${CMAKE_CURRENT_BINARY_DIR}/ski32.icns)
+    set_source_files_properties(${skifree_sdl_ICON} PROPERTIES
+       MACOSX_PACKAGE_LOCATION "Resources")
+
+    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${skifree_sdl_ICON})
+
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        BUNDLE True
+        MACOSX_BUNDLE_GUI_IDENTIFIER ${PROJECT_NAME}
+        MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}
+        MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
+        MACOSX_BUNDLE_ICON_FILE ski32.icns
+    )
+    
+    target_sources(${PROJECT_NAME} PRIVATE
+        ski32.icns
+    )
+
+else()
+    add_executable(${PROJECT_NAME})
+endif()
 
 add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h"
     COMMAND "${CMAKE_COMMAND}" "-DSOURCE_DIR=${CMAKE_SOURCE_DIR}" "-DRESOURCES_GLOB=resources/*" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/EmbedResources.cmake"
     DEPENDS ${resource_files}
+)
+
+target_sources(${PROJECT_NAME} PRIVATE 
+    src/skifree_decomp.c
+    embedded_resources.h
 )
 
 # Add all headers files under the include directory
@@ -31,7 +62,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${SDL2_IMAGE_INCLUDE_DIR}
     ${SDL2_TTF_INCLUDE_DIR}
 )
-
 
 
 # Add compiler errors/warnings flags
