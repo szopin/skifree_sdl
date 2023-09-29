@@ -40,6 +40,11 @@ if (APPLE)
         ski32.icns
     )
 
+    INSTALL(CODE "
+        include(BundleUtilities)
+        fixup_bundle(${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app \"\" \"/Library/Frameworks\")
+        ")
+
 else()
     add_executable(${PROJECT_NAME})
 endif()
@@ -59,8 +64,6 @@ target_sources(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME} PRIVATE 
     include
     "${CMAKE_CURRENT_BINARY_DIR}"
-    ${SDL2_IMAGE_INCLUDE_DIR}
-    ${SDL2_TTF_INCLUDE_DIR}
 )
 
 
@@ -73,4 +76,4 @@ else()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
 endif()
 
-target_link_libraries(${PROJECT_NAME} SDL2::SDL2 ${SDL2_IMAGE_LIBRARIES} ${SDL2_TTF_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf)

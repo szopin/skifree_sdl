@@ -922,7 +922,7 @@ BOOL calculateStatusWindowDimensions(HWND hWnd) {
     }
 
     // GetTextMetricsA(statusWindowDC, &textMetric);
-    TTF_SizeUTF8(statusWindowFont, "A", &w, &h);
+    TTF_SizeUTF8(statusWindowFont, "Ay", &w, &h);
     textLineHeight = h;
     str = getCachedString(IDS_TIME);
     len = strlen(str);
@@ -948,10 +948,14 @@ BOOL calculateStatusWindowDimensions(HWND hWnd) {
     str = getCachedString(IDS_STYLE_BLANK);
     len = strlen(str);
     statusWindowFindLongestTextString(statusWindowDC, &maxValueLength, str, len);
-    statusWindowHeight = textLineHeight * 4; // TODO is this correct?
-    //    _textLineHeight = _textLineHeight & 0xffff | (uint)(ushort)((short)_textLineHeight * 4) << 0x10;
+    statusWindowHeight = textLineHeight * 4;
     statusWindowTotalTextWidth = maxValueLength + maxKeyLength;
     statusWindowLabelWidth = maxKeyLength;
+
+    // added in sdl port
+    statusWindowTotalTextWidth += 5;
+    statusWindowHeight += 5;
+
     return 1;
 }
 
