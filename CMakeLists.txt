@@ -4,8 +4,8 @@ project(skifree_sdl)
 set(CMAKE_MODULE_PATH ${_MODULE_PATH} "${skifree_sdl_SOURCE_DIR}/cmake/")
 
 find_package(SDL2 REQUIRED)
-find_package(SDL2_image REQUIRED)
-find_package(SDL2_ttf REQUIRED)
+find_package(SDL2_IMAGE REQUIRED)
+find_package(SDL2_TTF REQUIRED)
 
 # Add all c source files under the src directory
 
@@ -63,10 +63,13 @@ target_sources(${PROJECT_NAME} PRIVATE
 # Add all headers files under the include directory
 target_include_directories(${PROJECT_NAME} PRIVATE 
     include
-    "${CMAKE_CURRENT_BINARY_DIR}"
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${SDL2IMAGE_INCLUDE_DIR}
+    ${SDL2TTF_INCLUDE_DIR}
 )
 
-
+message("hello world")
+message(${SDL2IMAGE_INCLUDE_DIR}, ${SDL2TTF_INCLUDE_DIR})
 # Add compiler errors/warnings flags
 if(MSVC)
     target_link_options(${PROJECT_NAME} PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
@@ -76,4 +79,4 @@ else()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
 endif()
 
-target_link_libraries(${PROJECT_NAME} SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf)
+target_link_libraries(${PROJECT_NAME} SDL2::SDL2 ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
