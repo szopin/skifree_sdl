@@ -4,8 +4,8 @@ project(skifree_sdl)
 set(CMAKE_MODULE_PATH ${_MODULE_PATH} "${skifree_sdl_SOURCE_DIR}/cmake/")
 
 find_package(SDL2 REQUIRED)
-find_package(SDL2_IMAGE REQUIRED)
-find_package(SDL2_TTF REQUIRED)
+find_package(SDL2_image REQUIRED)
+find_package(SDL2_ttf REQUIRED)
 
 # Add all c source files under the src directory
 
