@@ -18,6 +18,6 @@ cmake --build build --
 releasename="skifree_sdl-${BUILD_TAG}-darwin-${PLATFORM_ARCH}"
 rm -rf "$releasename"
 mkdir "$releasename"
-cp build/skifree_sdl "$releasename/skifree_sdl"
+cp -r build/skifree_sdl.app "$releasename/skifree_sdl"
 tar -czvf "$releasename.tar.gz" "$releasename"
-echo "filename=$releasename.tar.gz">>$GITHUB_OUTPUT
+echo "filename=skifree_sdl.app">>$GITHUB_OUTPUT
