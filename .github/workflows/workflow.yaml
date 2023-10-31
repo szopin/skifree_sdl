@@ -24,6 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup Ninja
+        if: runner.os == 'Windows'
         uses: ashutoshvarma/setup-ninja@master
         with:
           version: 1.10.2
