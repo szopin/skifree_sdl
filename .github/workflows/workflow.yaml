@@ -43,6 +43,7 @@ jobs:
         with:
           name: ${{ steps.build.outputs.filename }}
           path: ${{ steps.build.outputs.filename }}
+          if-no-files-found: error
 
   create-release:
     name: Create Release
