@@ -28,6 +28,10 @@ curl -Lo SDL2_ttf.dmg https://github.com/libsdl-org/SDL_ttf/releases/download/re
 hdiutil attach SDL2_ttf.dmg -mountpoint /tmp/SDL2_ttf
 sudo cp -R /tmp/SDL2_ttf/SDL2_ttf.framework /Library/Frameworks/
 
+# grab bitmap resources
+curl -Lo /tmp/ski32_resources.zip https://archive.org/download/ski32_resources/ski32_resources.zip
+unzip -d resources /tmp/ski32_resources.zip
+
 
 # build
 cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_OSX_ARCHITECTURES=x86_64 -B build
