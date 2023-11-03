@@ -38,7 +38,7 @@ jobs:
         env:
           PLATFORM_ARCH: ${{ matrix.platform.arch }}
       - name: Upload Artifact
-        if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
+        if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main' || github.ref_name == 'ci-debug'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build.outputs.filename }}
