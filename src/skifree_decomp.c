@@ -75,16 +75,6 @@ int main(int argc, char* argv[]) {
             case SDL_KEYDOWN:
                 handleKeydownMessage(&event);
                 break;
-
-                // case SDL_USEREVENT:
-                //     switch (event.user.code) {
-                //     case USER_EVENT_CODE_TIMER:
-                //         timerUpdateFunc();
-                //         break;
-                //     default:
-                //         abort();
-                //     }
-                //     break;
             }
         }
 
@@ -871,7 +861,10 @@ void paintStatusWindow(HWND hWnd) {
     // FrameRect(paint.hdc, &statusBorderRect, hbr);
 
     SDL_LockTextureToSurface(statusWindowTexture, NULL, &statusWindowSurface);
-    SDL_FillRect(statusWindowSurface, NULL, SDL_MapRGB(statusWindowSurface->format, 255, 255, 255));
+
+    SDL_FillRect(statusWindowSurface, NULL, SDL_MapRGB(statusWindowSurface->format, 0, 0, 0));
+    SDL_Rect r = { 1, 1, statusWindowSurface->w - 2, statusWindowSurface->h - 2 };
+    SDL_FillRect(statusWindowSurface, &r, SDL_MapRGB(statusWindowSurface->format, 255, 255, 255));
 
     str = getCachedString(IDS_TIME);
     len = strlen(str);
@@ -3019,9 +3012,9 @@ void formatAndPrintStatusStrings(HDC windowDC) {
     SDL_LockTextureToSurface(statusWindowTexture, NULL, &statusWindowSurface);
     SDL_Rect rect;
     rect.x = x;
-    rect.y = 0;
-    rect.w = statusWindowSurface->w - x;
-    rect.h = statusWindowSurface->h;
+    rect.y = 1;
+    rect.w = statusWindowSurface->w - x - 1;
+    rect.h = statusWindowSurface->h - 2;
     SDL_FillRect(statusWindowSurface, &rect, SDL_MapRGB(statusWindowSurface->format, 255, 255, 255));
 
     len = formatElapsedTime(elapsedTime, strBuf);
@@ -3265,45 +3258,43 @@ void setupPermObjects() {
 // TODO not byte accurate
 void handleKeydownMessage(SDL_Event* e) {
     short sVar1;
-    uint32_t ActorframeNo;
+    uint32_t actorframeNo;
 
-    // switch (charCode)
-    // {
-    // case VK_ESCAPE:
-    //     ShowWindow(hSkiMainWnd, 6);
-    //     return;
-    // case VK_F3:
-    //     togglePausedState(); // TODO this is a jmp rather than a call in the original
-    //     return;
-    // case VK_RETURN:
-    //     if (playerActor != (Actor *)0x0)
-    //     {
-    //         return;
-    //     }
-    //     handleGameReset(); // TODO this is a jmp rather than a call in the original
-    //     return;
-    // case VK_F2:
-    //     handleGameReset(); // TODO this is a jmp rather than a call in the original
-    //     return;
-    // default:
-    //     break;
-    // }
+    switch (e->key.keysym.sym) {
+    case SDLK_ESCAPE:
+        // ShowWindow(hSkiMainWnd, 6 /*SW_MINIMIZE*/);
+        SDL_MinimizeWindow(hSkiMainWnd);
+        return;
+    case SDLK_F3:
+        togglePausedState(); // TODO this is a jmp rather than a call in the original
+        return;
+    case SDLK_RETURN:
+        if (playerActor != (Actor*)0x0) {
+            return;
+        }
+        handleGameReset(); // TODO this is a jmp rather than a call in the original
+        return;
+    case SDLK_F2:
+        handleGameReset(); // TODO this is a jmp rather than a call in the original
+        return;
+    default:
+        break;
+    }
 
     if (playerActor == NULL) {
         return;
     }
-    ActorframeNo = playerActor->frameNo;
+    actorframeNo = playerActor->frameNo;
     sVar1 = playerActor->isInAir;
-    if ((ActorframeNo != 0xb) && (ActorframeNo != 0x11)) {
+    if ((actorframeNo != 0xb) && (actorframeNo != 0x11)) {
         switch (e->key.keysym.sym) {
-        case 0x25:
         case SDLK_LEFT:
             /* numpad 4
                left */
-            ski_assert(ActorframeNo < 0x16, 0xf63);
+            ski_assert(actorframeNo < 0x16, 0xf63);
 
-            ActorframeNo = playerTurnFrameNoTbl[ActorframeNo].leftFrameNo;
-            if (ActorframeNo == 7) {
+            actorframeNo = playerTurnFrameNoTbl[actorframeNo].leftFrameNo;
+            if (actorframeNo == 7) {
                 //                    iVar2 = (int)playerActor->HorizontalVelMaybe - 8;
                 //                    if (iVar2 <= -8) {
                 //                        iVar2 = -8;
@@ -3312,13 +3303,13 @@ void handleKeydownMessage(SDL_Event* e) {
                 playerActor->HorizontalVelMaybe = max_(playerActor->HorizontalVelMaybe - 8, -8);
             }
             break;
-        case 0x27:
+
         case SDLK_RIGHT:
             /* numpad 6, Right */
-            ski_assert(ActorframeNo < 0x16, 3947);
+            ski_assert(actorframeNo < 0x16, 3947);
 
-            ActorframeNo = playerTurnFrameNoTbl[ActorframeNo].rightFrameNo;
-            if (ActorframeNo == 8) {
+            actorframeNo = playerTurnFrameNoTbl[actorframeNo].rightFrameNo;
+            if (actorframeNo == 8) {
                 //                    iVar2 = (int) playerActor->HorizontalVelMaybe + 8;
                 //                    if (iVar2 >= 8) {
                 //                        iVar2 = 8;
@@ -3329,87 +3320,81 @@ void handleKeydownMessage(SDL_Event* e) {
             }
             break;
 
-        case 0x28:
         case SDLK_DOWN:
-            /* down key pressed */
             if (sVar1 == 0) {
-                ActorframeNo = 0;
+                actorframeNo = 0;
                 break;
             }
-            switch (ActorframeNo) {
+            switch (actorframeNo) {
             case 0xd:
-                ActorframeNo = 0x13;
+                actorframeNo = 0x13;
                 break;
             case 0x14:
-                ActorframeNo = 0xe;
+                actorframeNo = 0xe;
                 break;
             case 0x15:
-                ActorframeNo = 0xf;
+                actorframeNo = 0xf;
                 break;
             case 0x12:
-                ActorframeNo = 0xd;
+                actorframeNo = 0xd;
                 break;
             case 0x13:
-                ActorframeNo = 0x12;
+                actorframeNo = 0x12;
                 break;
             }
             break;
 
-        case 0x26:
         case SDLK_UP:
-            /* numpad 8 Up */
-            switch (ActorframeNo) {
+            switch (actorframeNo) {
             case 0xd:
                 //                switchD_0040628c_caseD_13:
-                ActorframeNo = 0x12;
+                actorframeNo = 0x12;
                 break;
             case 0x13:
                 //                switchD_0040628c_caseD_12:
-                ActorframeNo = 0xd;
+                actorframeNo = 0xd;
                 break;
             case 0xe:
-                ActorframeNo = 0x14;
+                actorframeNo = 0x14;
                 break;
             case 0xf:
-                ActorframeNo = 0x15;
+                actorframeNo = 0x15;
                 break;
             case 3:
             case 7:
             case 0xc:
                 if (playerActor->verticalVelocityMaybe == 0) {
-                    ActorframeNo = 9;
+                    actorframeNo = 9;
                     playerActor->verticalVelocityMaybe = -4;
                 }
                 break;
             case 6:
             case 8:
                 if (playerActor->verticalVelocityMaybe == 0) {
-                    ActorframeNo = 10;
+                    actorframeNo = 10;
                     playerActor->verticalVelocityMaybe = -4;
                 }
                 break;
             case 0x12:
                 //                switchD_0040628c_caseD_d:
-                ActorframeNo = 0x13;
+                actorframeNo = 0x13;
                 break;
             }
             break;
 
-        case 0x24:
-        case 0x67:
-            /* numpad 7
-               up left */
+        case SDLK_KP_7:
             if (sVar1 == 0) {
-                ActorframeNo = 3;
+                actorframeNo = 3;
             }
             break;
 
         case 0x21:
         case 0x69:
+        case SDLK_KP_9:
             /* numpad 9
                Up right */
             if (sVar1 == 0) {
-                ActorframeNo = 6;
+                actorframeNo = 6;
             }
             break;
 
@@ -3418,7 +3403,7 @@ void handleKeydownMessage(SDL_Event* e) {
             /* numpad 1
                down left */
             if (sVar1 == 0) {
-                ActorframeNo = 1;
+                actorframeNo = 1;
             }
             break;
 
@@ -3427,7 +3412,7 @@ void handleKeydownMessage(SDL_Event* e) {
             /* numpad 3
                down right */
             if (sVar1 == 0) {
-                ActorframeNo = 4;
+                actorframeNo = 4;
             }
             break;
 
@@ -3437,7 +3422,7 @@ void handleKeydownMessage(SDL_Event* e) {
                Jump. */
             if (sVar1 == 0) {
                 playerActor->inAirCounter = 2;
-                ActorframeNo = 0xd;
+                actorframeNo = 0xd;
                 if (4 < playerActor->verticalVelocityMaybe) {
                     playerActor->verticalVelocityMaybe = playerActor->verticalVelocityMaybe + -4;
                 }
@@ -3445,7 +3430,7 @@ void handleKeydownMessage(SDL_Event* e) {
         }
     }
 
-    if ((ActorframeNo != playerActor->frameNo) && (setActorFrameNo(playerActor, ActorframeNo), redrawRequired != 0)) {
+    if ((actorframeNo != playerActor->frameNo) && (setActorFrameNo(playerActor, actorframeNo), redrawRequired != 0)) {
         drawWindow(mainWindowDC, &windowClientRect);
         redrawRequired = 0;
     }
@@ -3884,18 +3869,6 @@ void drawActor(HDC hdc, Actor* actor) {
 
                 // SRCAND
                 // BitBlt(hdc, rect->left, rect->top, (int)sprite->width, (int)sprite->height, sprite->sheetDC, 0, (int)sprite->sheetYOffset, 0x8800c6);
-                SDL_Rect src;
-                src.x = 0;
-                src.y = sprite->sheetYOffset;
-                src.w = sprite->width;
-                src.h = sprite->height;
-
-                SDL_Rect dest;
-                dest.x = rect->left;
-                dest.y = rect->top;
-                dest.w = sprite->width;
-                dest.h = sprite->height;
-                // SDL_RenderCopy(renderer, sprite->sheet, &src, &dest);
                 actor->flags |= FLAG_1;
             } else {
                 actor->flags &= 0xfffffffe;
@@ -3956,18 +3929,18 @@ void drawActor(HDC hdc, Actor* actor) {
             ski_assert(rect->bottom - rect->top == spriteHeight, 1204);
             ski_assert(local_14 >= 0, 1205);
 
-            if (sVar10 < 0) {
-                printf("skipping because sVar10\n");
-                return;
-            }
+            // if (sVar10 < 0) {
+            //     printf("skipping because sVar10\n");
+            //     return;
+            // }
 
             ski_assert(sVar10 >= 0, 1206);
             ski_assert(newWidth >= spriteWidth, 1207);
 
-            if (sVar10 < 0) {
-                printf("skipping because sVar10\n");
-                return;
-            }
+            // if (sVar10 < 0) {
+            //     printf("skipping because sVar10\n");
+            //     return;
+            // }
             if (newHeight < spriteHeight) {
                 assertFailed(sourceFilename, 1208);
             }
