@@ -26,7 +26,6 @@ typedef struct _RECT {
 
 typedef struct
 {
-    int id; // added by jeff
     HDC sheetDC;
     HDC sheetDC_1bpp;
     SDL_Texture* sheet;

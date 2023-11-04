@@ -4,10 +4,10 @@
 #define NOMINMAX
 
 #include "skifree_decomp.h"
+#include "consts.h"
 #include "data.h"
 #include "embedded_resources.h"
 #include "resource.h"
-#include "sdl_helpers.h"
 #include <SDL_image.h>
 #include <stdio.h>
 
@@ -3643,9 +3643,8 @@ BOOL createBitmapSheets(HDC param_1) {
     //     return FALSE;
     // }
     // bitmapSourceDC = CreateCompatibleDC(param_1);
-    for (resourceId = 1; (uint16_t)resourceId < 90; resourceId++) {
+    for (resourceId = 1; (uint16_t)resourceId < NUM_SPRITES; resourceId++) {
         sprite = &sprites[resourceId];
-        sprite->id = resourceId;
         bitmap = loadBitmapResource(resourceId);
         if (bitmap == (HBITMAP)0x0) {
             return FALSE;
