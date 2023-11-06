@@ -1,7 +1,7 @@
 Skifree SDL
 =============================
 
-A source port of the classic Windows 95 Entertainment Pack game "skifree" to cross platform SDL2.
+A source port of the classic [Microsoft Entertainment Pack](https://en.wikipedia.org/wiki/Microsoft_Entertainment_Pack) game "skifree" to cross platform SDL2.
 
 Forked from the decompiled skifree [skifree_decomp](https://github.com/yuv422/skifree_decomp) by Eric Fry
 
