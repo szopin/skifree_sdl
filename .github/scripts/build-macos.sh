@@ -12,7 +12,11 @@ else
 fi
 
 # install deps
-# dont use brew as it installs sdl as .dylib not as a framework and breaks the .app package build
+
+# required for converting ICO file to PNG
+brew install imagemagick
+
+# dont use brew for SDL as it installs sdl as .dylib not as a framework and breaks the .app package build
 #brew install SDL2 sdl2_image sdl2_ttf
 
 curl -Lo SDL2.dmg https://github.com/libsdl-org/SDL/releases/download/release-${SDL2_VERSION}/SDL2-${SDL2_VERSION}.dmg

@@ -3643,7 +3643,7 @@ BOOL createBitmapSheets(HDC param_1) {
     //     return FALSE;
     // }
     // bitmapSourceDC = CreateCompatibleDC(param_1);
-    for (resourceId = 1; (uint16_t)resourceId < NUM_SPRITES; resourceId++) {
+    for (resourceId = 1; resourceId < NUM_SPRITES; resourceId++) {
         sprite = &sprites[resourceId];
         bitmap = loadBitmapResource(resourceId);
         if (bitmap == (HBITMAP)0x0) {

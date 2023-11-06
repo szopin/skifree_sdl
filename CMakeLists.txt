@@ -14,11 +14,19 @@ file(GLOB resource_files "resources/*.bmp")
 
 if (APPLE)
 
-    # generate icns file
+    # generate png file from ico
     add_custom_command(
-        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ski32.icns"
-        COMMAND "${CMAKE_SOURCE_DIR}/tools/make-osx-icns.sh"
-        DEPENDS "resources/ICONSKI.png"
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ICONSKI.png
+        COMMAND convert
+        ARGS -flatten ${CMAKE_SOURCE_DIR}/resources/ICONSKI.ICO ${CMAKE_CURRENT_BINARY_DIR}/ICONSKI.PNG
+        DEPENDS ${CMAKE_SOURCE_DIR}/resources/ICONSKI.ICO
+    )
+
+    # generate icns file from png
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ski32.icns
+        COMMAND ${CMAKE_SOURCE_DIR}/tools/make-osx-icns.sh
+        DEPENDS ICONSKI.png
     )
 
     set(skifree_sdl_ICON ${CMAKE_CURRENT_BINARY_DIR}/ski32.icns)
@@ -68,8 +76,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${SDL2TTF_INCLUDE_DIR}
 )
 
-message("hello world")
-message(${SDL2IMAGE_INCLUDE_DIR}, ${SDL2TTF_INCLUDE_DIR})
 # Add compiler errors/warnings flags
 if(MSVC)
     target_link_options(${PROJECT_NAME} PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
