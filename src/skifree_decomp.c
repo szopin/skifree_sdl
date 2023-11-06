@@ -449,9 +449,10 @@ int initWindows() {
     nHeight = SCREEN_HEIGHT;
     lpWindowName = getCachedString(IDS_TITLE);
 
-    // todo figure out client size we want
+    // original code was asking for overall window size, here we have to convert it
+    // to client size to get the correct original ratio
     nWidth = 1008;
-    nHeight = 985;
+    nHeight = nWidth * 0.97718253968254f;
 
     hSkiMainWnd = SDL_CreateWindow(lpWindowName,
         SDL_WINDOWPOS_CENTERED,
