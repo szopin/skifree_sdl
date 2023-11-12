@@ -32,6 +32,10 @@ This is a cmake project.
 ```sh
 git clone https://github.com/jeff-1amstudios/skifree_sdl
 cd skifree_sdl
+# grab resources
+curl -Lo /tmp/ski32_resources.zip https://archive.org/download/ski32_resources/ski32_resources.zip
+unzip -d resources /tmp/ski32_resources.zip
+
 mkdir build
 cd build
 cmake ..
@@ -44,5 +48,4 @@ On MacOS we build an app bundle `skifree_sdl.app`. Use right-click > Open the fi
 
 ## Todo
 - Mouse support
-- Style points are broken sometimes
 - Sound (maybe?)

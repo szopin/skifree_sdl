@@ -227,6 +227,10 @@ void HandleWindowMessage(SDL_Event* e) {
     case SDL_WINDOWEVENT_RESTORED:
         isMinimised = 0;
         break;
+
+    case SDL_WINDOWEVENT_SIZE_CHANGED:
+        updateWindowSize(hSkiMainWnd);
+        break;
     }
 }
 
@@ -458,7 +462,7 @@ int initWindows() {
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         nWidth, nHeight,
-        SDL_WINDOW_SHOWN);
+        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
     renderer = SDL_CreateRenderer(hSkiMainWnd, -1, SDL_RENDERER_ACCELERATED);
 
