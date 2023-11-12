@@ -48,4 +48,4 @@ On MacOS we build an app bundle `skifree_sdl.app`. Use right-click > Open the fi
 
 ## Todo
 - Mouse support
-- Sound (maybe?)
+- Sound maybe(?) - https://foone.wordpress.com/2017/06/20/uncovering-the-sounds-of-skifree/
