@@ -75,6 +75,13 @@ int main(int argc, char* argv[]) {
             case SDL_KEYDOWN:
                 handleKeydownMessage(&event);
                 break;
+            case SDL_FINGERDOWN:
+                handleKeydownMessage(&event);
+                break;
+        //  SDL_Log("Finger: %" SDL_PRIs64 " down - x: %f, y: %f",
+          //     event.tfinger.fingerId, event.tfinger.x, event.tfinger.y);
+         //   break;
+                
             }
         }
 
@@ -475,6 +482,7 @@ int initWindows() {
     }
 
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xFF);
+    SDL_SetWindowFullscreen(hSkiMainWnd, 1);
 
     calculateStatusWindowDimensions(hSkiStatusWnd);
     statusWindowTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, statusWindowTotalTextWidth, statusWindowHeight);
@@ -691,7 +699,7 @@ Actor* addActor(Actor* actor, BOOL insertBack) {
         }
         return targetActor;
     } else {
-        assertFailed(sourceFilename, 857);
+ //       assertFailed(sourceFilename, 857);
     }
 
     return targetActor; // TODO fixme the original does `MOV EAX, EBX` but we seem to be doing `XOR EAX, EAX`
@@ -3292,6 +3300,29 @@ void handleKeydownMessage(SDL_Event* e) {
     actorframeNo = playerActor->frameNo;
     sVar1 = playerActor->isInAir;
     if ((actorframeNo != 0xb) && (actorframeNo != 0x11)) {
+        switch (e->type) {
+            case SDL_FINGERDOWN:
+            SDL_Log("Finger: %" SDL_PRIs64 " down - x: %f, y: %f",
+               e->tfinger.fingerId, e->tfinger.x, e->tfinger.y);
+                if(e->tfinger.x <0.5){
+                                ski_assert(actorframeNo < 0x16, 0xf63);
+
+            actorframeNo = playerTurnFrameNoTbl[actorframeNo].leftFrameNo;
+            if (actorframeNo == 7) {
+                playerActor->HorizontalVelMaybe = max_(playerActor->HorizontalVelMaybe - 8, -8);
+            }
+            break;
+                } else {
+                                ski_assert(actorframeNo < 0x16, 3947);
+
+            actorframeNo = playerTurnFrameNoTbl[actorframeNo].rightFrameNo;
+            if (actorframeNo == 8) {
+
+                playerActor->HorizontalVelMaybe = min_(playerActor->HorizontalVelMaybe + 8, 8);
+                    }
+            break;
+                }
+        }
         switch (e->key.keysym.sym) {
         case SDLK_LEFT:
             /* numpad 4
